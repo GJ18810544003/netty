@@ -69,6 +69,13 @@ public class MultiplexerTimeServer implements Runnable{
                 throwable.printStackTrace();
             }
         }
+        if (selector != null) {
+            try {
+                selector.close();
+            }catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     private void handleInput(SelectionKey key) throws IOException {
@@ -117,6 +124,7 @@ public class MultiplexerTimeServer implements Runnable{
             writeBuffer.put(bytes);
             writeBuffer.flip();
             channel.write(writeBuffer);
+            System.out.println("The server write res:" + response);
         }
     }
 }

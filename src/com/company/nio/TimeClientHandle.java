@@ -79,6 +79,14 @@ public class TimeClientHandle implements Runnable{
             }
         }
 
+        if (selector != null) {
+            try {
+                selector.close();
+            }catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
     }
 
     private void handleInput(SelectionKey key) throws IOException{
@@ -92,27 +100,28 @@ public class TimeClientHandle implements Runnable{
                 }else {
                     System.exit(1);
                 }
+            }
 
-                if (key.isReadable()) {
-                    ByteBuffer readBuffer = ByteBuffer.allocate(1024);
-                    int readBytes = sc.read(readBuffer);
-                    if (readBytes > 0) {
-                        readBuffer.flip();
-                        byte[] bytes = new byte[readBuffer.remaining()];
-                        readBuffer.get(bytes);
+            if (key.isReadable()) {
+                ByteBuffer readBuffer = ByteBuffer.allocate(1024);
+                int readBytes = sc.read(readBuffer);
+                if (readBytes > 0) {
+                    readBuffer.flip();
+                    byte[] bytes = new byte[readBuffer.remaining()];
+                    readBuffer.get(bytes);
 
-                        String body = new String(bytes, "UTF-8");
-                        System.out.println("Now is : " + body);
-                        this.stop = true;
-                    }else if (readBytes < 0) {
-                        // 对端链路关闭
-                        key.cancel();
-                        sc.close();
-                    }else {
-                        // Read zero bytes, ignore
-                    }
+                    String body = new String(bytes, "UTF-8");
+                    System.out.println("Now is : " + body);
+                    this.stop = true;
+                }else if (readBytes < 0) {
+                    // 对端链路关闭
+                    key.cancel();
+                    sc.close();
+                }else {
+                    // Read zero bytes, ignore
                 }
             }
+
 
         }
     }
